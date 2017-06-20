@@ -227,9 +227,10 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if(v == mCenterStart){
-            if(mControll.isIDLE()){
-                mControll.restart();
-            }
+
+            mControll.release();
+            mControll.start();
+
         }else if(v == mPasue){
             if(mControll.isPlaying()){
                 mControll.pause();
@@ -256,10 +257,11 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         //滑动结束
-         if(mControll.isPause()){
+        if(mControll.isPause()){
              mControll.restart();
-         }
-       int pos = (int) (mControll.getDuration() * seekBar.getProgress() / 100f); //
+        }
+
+        int pos = (int) (mControll.getDuration() * seekBar.getProgress() / 100f); //
         mControll.seekTo(pos);
 
     }
@@ -276,6 +278,7 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
         boolean isPlaying();
         boolean isIDLE();
         boolean isPause();
+        boolean isBuffPause();
         int     getBufferPercentage();
 
         void finish();

@@ -308,10 +308,8 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
 
     @Override
     public boolean isPlaying() {
-        if(isInPlaybackState()){
-            return mMediaPlayer.isPlaying();
-        }
-        return false;
+
+        return mCurrentState == STATE_PLAYING || mCurrentState == STATE_BUFFERING_PLAYING;
     }
 
     @Override
@@ -322,6 +320,11 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
     @Override
     public boolean isPause() {
         return mCurrentState == STATE_PAUSED;
+    }
+
+    @Override
+    public boolean isBuffPause() {
+        return mCurrentState == STATE_BUFFERING_PAUSED;
     }
 
     @Override
