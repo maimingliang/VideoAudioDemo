@@ -46,13 +46,8 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
     public static final int STATE_PAUSED = 4;
     public static final int STATE_COMPLETED = 5;
 
-    /**
-     * 正在缓冲(播放器正在播放时，缓冲区数据不足，进行缓冲，缓冲区数据足够后恢复播放)
-     **/
     public static final int STATE_BUFFERING_PLAYING = 6;
-    /**
-     * 正在缓冲(播放器正在播放时，缓冲区数据不足，进行缓冲，此时暂停播放器，继续缓冲，缓冲区数据足够后恢复暂停)
-     **/
+
     public static final int STATE_BUFFERING_PAUSED = 7;
 
     // settable by the client
@@ -239,10 +234,10 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
             mCurrentState = STATE_PREPARING;
             setControllerState();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("wxplayer", "打开播放器错误 msg = " + e.getMessage());
             mCurrentState = STATE_ERROR;
             setControllerState();
-            Log.e("wxplayer", "打开播放器错误 msg = " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
