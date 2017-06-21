@@ -1,4 +1,4 @@
-package com.elk.wxplayer;
+package com.elk.wxplayer.play;
 
 import android.content.Context;
 import android.os.Handler;
@@ -13,6 +13,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.elk.wxplayer.NiceUtil;
+import com.elk.wxplayer.R;
 
 /**
  * 类       名:

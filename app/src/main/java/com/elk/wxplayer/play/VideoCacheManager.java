@@ -1,4 +1,4 @@
-package com.elk.wxplayer;
+package com.elk.wxplayer.play;
 
 import android.content.Context;
 

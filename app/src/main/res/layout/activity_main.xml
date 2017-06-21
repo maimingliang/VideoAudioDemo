@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
 
     tools:context="com.elk.wxplayer.MainActivity">
 
-    <com.elk.wxplayer.WxPlayer
-        android:id="@+id/wx_player"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/btn1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="btn1"/>
 
-</RelativeLayout>
+
+</LinearLayout>

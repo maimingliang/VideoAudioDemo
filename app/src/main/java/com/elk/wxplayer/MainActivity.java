@@ -1,7 +1,12 @@
 package com.elk.wxplayer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+
+import com.elk.wxplayer.play.PlayerActivity;
+import com.elk.wxplayer.play.WxPlayer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,24 +17,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mWxPlayer = (WxPlayer) findViewById(R.id.wx_player);
-
-       String path = "http://tanzi27niu.cdsb.mobi/wps/wp-content/uploads/2017/05/2017-05-17_17-33-30.mp4";
-//       String path = "/storage/emulated/0/DCIM/Camera/20170521_200117.mp4";
-//       String path = "http://192.168.0.232:8089/group1/M00/00/90/wKgA6FlI5MqAIQuTAAml3v7Z8Mo830.mp4";
-
-        mWxPlayer.setVideoPath(path);
-
-        WxMediaController controller = new WxMediaController(this);
-        controller.setThumbImage("http://192.168.0.232:8089/group1/M00/00/90/wKgA6FlI5MqAJVGlAAAcfondTlY728.jpg").setThumbHeight(640);
-        mWxPlayer.setMediaController(controller);
+        findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,PlayerActivity.class));
+            }
+        });
      }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mWxPlayer != null){
-            mWxPlayer.release();
-        }
+
     }
 }
