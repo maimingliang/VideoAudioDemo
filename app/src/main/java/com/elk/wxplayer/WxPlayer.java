@@ -7,6 +7,7 @@ import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
@@ -139,7 +140,19 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
      * @param path the path of the video.
      */
     public void setVideoPath(String path) {
-        setVideoURI(Uri.parse(path));
+
+        if(TextUtils.isEmpty(path)){
+            Log.e("setVideoPath", " 视频路径 为不合法");
+           return;
+        }
+        String proxyUrl = path;
+        if(path.startsWith("http://") || path.startsWith("https://")){
+            proxyUrl  = VideoCacheManager.getInstance().getProxy(mContext).getProxyUrl(path);
+        }
+
+
+        Log.e("setVideoPath", "---- . proxyUrl = " + proxyUrl);
+        setVideoURI(Uri.parse(proxyUrl));
     }
 
     /**
@@ -147,12 +160,12 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
      *
      * @param uri the URI of the video.
      */
-    public void setVideoURI(Uri uri) {
+    private void setVideoURI(Uri uri) {
         setVideoURI(uri, null);
     }
 
 
-    public void setVideoURI(Uri uri, Map<String, String> headers) {
+    private void setVideoURI(Uri uri, Map<String, String> headers) {
         mUri = uri;
         mHeaders = headers;
         start();
@@ -169,7 +182,7 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
     }
 
     private void initTextureView() {
-
+        Log.e("initTextureView ","initTextureView");
         if(mTextureView == null){
             mTextureView = new TextureView(mContext);
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
@@ -181,6 +194,7 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
             mRlTextueView = new RelativeLayout(mContext);
         }
 
+        mRlTextueView.removeView(mTextureView);
         RelativeLayout.LayoutParams params =
                 new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -192,8 +206,9 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
 
     private void initMediaPlayer() {
 
-        if(mMediaPlayer == null){
 
+        if(mMediaPlayer == null){
+            Log.e("initMediaPlayer ","initMediaPlayer");
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setScreenOnWhilePlaying(true);
@@ -212,8 +227,8 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
 
     private void openVideo() {
 
-        if(mUri == null || mSurfaceTexture == null){
-            Log.e("wxplayer", "打开播放器错误 mUri == null ||  mSurfaceTexture == null" );
+        if(mUri == null || mSurfaceTexture == null || mMediaPlayer == null){
+            Log.e("openVideo", "打开播放器错误 mUri == null ||  mSurfaceTexture == null" );
             return;
         }
 
@@ -226,6 +241,7 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
         } catch (IOException e) {
             e.printStackTrace();
             mCurrentState = STATE_ERROR;
+            setControllerState();
             Log.e("wxplayer", "打开播放器错误 msg = " + e.getMessage());
         }
     }
@@ -379,7 +395,7 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
 
 
             // the size is fixed
-           int width = getDeviceWidth();
+           int width = getDeviceWidth(); // 对视频缩放
             int height = width * mVideoHeight / mVideoWidth;
 
             // for compatibility, we adjust size based on aspect ratio

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,9 +40,13 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     private WxMediaControll mControll;
     private ImageView mPasue;
     private Handler mHandler = new Handler();
-     private LinearLayout mTop;
+    private LinearLayout mTop;
     private boolean mTopBottomVisible;
     private LinearLayout mLoading;
+
+    private int thumbWidth;
+    private int thumbHeight;
+    private LinearLayout mError;
 
     public WxMediaController(Context context) {
         super(context);
@@ -51,7 +55,8 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     }
 
     private void init() {
-        LayoutInflater.from(mContext).inflate(R.layout.video_palyer_controller, this, true);
+        View.inflate(mContext, R.layout.video_palyer_controller, this);
+
         mImage = (ImageView) findViewById(R.id.image);
         mBack = (ImageView) findViewById(R.id.back);
         mBottom = (LinearLayout) findViewById(R.id.bottom);
@@ -62,6 +67,7 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
         mPasue = (ImageView) findViewById(R.id.restart_or_pause);
         mTop = (LinearLayout) findViewById(R.id.top);
         mLoading = (LinearLayout) findViewById(R.id.loading);
+        mError = (LinearLayout) findViewById(R.id.error);
 
         mCenterStart.setOnClickListener(this);
         mPasue.setOnClickListener(this);
@@ -71,59 +77,71 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
         setTopBottomVisible(false);
     }
 
-    public void setImage(String imageUrl) {
+    public WxMediaController setThumbImage(String imageUrl) {
         Glide.with(mContext)
                 .load(imageUrl)
                 .placeholder(R.drawable.all_darkbackground)
                 .crossFade()
                 .into(mImage);
+        return this;
     }
 
-    public void setImage(@DrawableRes int resId) {
+    public WxMediaController setThumbWidth(int width){
+        thumbWidth = width;
+        return this;
+    }
+
+    public WxMediaController setThumbHeight(int height){
+        thumbHeight = height;
+
+        ViewGroup.LayoutParams layoutParams = mImage.getLayoutParams();
+
+        layoutParams.height =thumbHeight;
+
+        mImage.setLayoutParams(layoutParams);
+
+        return this;
+    }
+
+    public void setThumbImage(@DrawableRes int resId) {
         mImage.setImageResource(resId);
     }
 
-    public void setWxPlayer(WxMediaControll controll){
-        mControll =controll;
+    public void setWxPlayer(WxMediaControll controll) {
+        mControll = controll;
     }
 
-    public void setControllerState(int currState){
+    public void setControllerState(int currState) {
 
         Log.e("tag", "------ currState = " + currState);
-        switch (currState){
+        switch (currState) {
             case WxPlayer.STATE_IDLE:
                 break;
             case WxPlayer.STATE_ERROR:
                 mImage.setVisibility(GONE);
                 mCenterStart.setVisibility(GONE);
-                mBottom.setVisibility(GONE);
                 mLoading.setVisibility(GONE);
-                mTop.setVisibility(GONE);
+                mError.setVisibility(VISIBLE);
                 removeCallback();
                 setTopBottomVisible(false);
                 break;
             case WxPlayer.STATE_COMPLETED:
-                mImage.setVisibility(GONE);
+                mImage.setVisibility(VISIBLE);
                 mCenterStart.setVisibility(VISIBLE);
-                mBottom.setVisibility(VISIBLE);
-                mTop.setVisibility(VISIBLE);
                 mLoading.setVisibility(GONE);
                 removeCallback();
                 setTopBottomVisible(false);
                 break;
             case WxPlayer.STATE_PREPARING:
-                mImage.setVisibility(GONE);
+                mImage.setVisibility(VISIBLE);
                 mCenterStart.setVisibility(GONE);
-                mBottom.setVisibility(VISIBLE);
-                mTop.setVisibility(VISIBLE);
                 mLoading.setVisibility(VISIBLE);
+                mError.setVisibility(GONE);
                 mPasue.setImageResource(R.drawable.ic_player_start);
                 break;
             case WxPlayer.STATE_PREPARED:
                 mImage.setVisibility(GONE);
                 mCenterStart.setVisibility(GONE);
-                mBottom.setVisibility(VISIBLE);
-                mTop.setVisibility(VISIBLE);
                 mPasue.setImageResource(R.drawable.ic_player_start);
                 mLoading.setVisibility(VISIBLE);
                 startUpdateProgress();
@@ -131,16 +149,12 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
             case WxPlayer.STATE_PLAYING:
                 mImage.setVisibility(GONE);
                 mCenterStart.setVisibility(GONE);
-                mBottom.setVisibility(VISIBLE);
-                mTop.setVisibility(VISIBLE);
                 mLoading.setVisibility(GONE);
                 mPasue.setImageResource(R.drawable.ic_player_pause);
-                 break;
+                break;
             case WxPlayer.STATE_PAUSED:
                 mImage.setVisibility(GONE);
                 mCenterStart.setVisibility(GONE);
-                mBottom.setVisibility(VISIBLE);
-                mTop.setVisibility(VISIBLE);
                 mLoading.setVisibility(GONE);
                 mPasue.setImageResource(R.drawable.ic_player_start);
                 break;
@@ -161,7 +175,7 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     }
 
 
-    private Runnable delayRunnable = new Runnable() {
+    private Runnable progressRunnable = new Runnable() {
         @Override
         public void run() {
             updateProgress();
@@ -181,65 +195,65 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
         int position = mControll.getCurrentPosition();
         int duration = mControll.getDuration();
 
-        if(duration == 0){
+        if (duration == 0) {
             return;
         }
         int bufferPercentage = mControll.getBufferPercentage();
 
         mSeek.setSecondaryProgress(bufferPercentage);
-        int progress = (int) (100f * position / duration );
+        int progress = (int) (100f * position / duration);
         mSeek.setProgress(progress);
 
         mPosition.setText(NiceUtil.formatTime(position));
         mDuration.setText(NiceUtil.formatTime(duration));
     }
 
-    public void startUpdateProgress(){
-        mHandler.postDelayed(delayRunnable, 500);
+    public void startUpdateProgress() {
+        mHandler.postDelayed(progressRunnable, 500);
     }
 
-    public void removeCallback(){
-        mHandler.removeCallbacks(delayRunnable);
+    public void removeCallback() {
+        mHandler.removeCallbacks(progressRunnable);
     }
 
     private void startDismissTopBottomTimer() {
-         mHandler.postDelayed(dismissTopBottomRunnable,3000);
+        mHandler.postDelayed(dismissTopBottomRunnable, 5000);
     }
 
     private void setTopBottomVisible(boolean visible) {
 
         mTopBottomVisible = visible;
-        mTop.setVisibility( visible == true ? VISIBLE : INVISIBLE);
-        mBottom.setVisibility( visible == true ? VISIBLE : INVISIBLE);
-         if(!visible){
-             cancelDismissTopBottomTimer();
-         }else{
-             startDismissTopBottomTimer();
-         }
+        mTop.setVisibility(visible == true ? VISIBLE : INVISIBLE);
+        mBottom.setVisibility(visible == true ? VISIBLE : INVISIBLE);
+        if (!visible) {
+            cancelDismissTopBottomTimer();
+        } else {
+            startDismissTopBottomTimer();
+        }
 
 
     }
 
     private void cancelDismissTopBottomTimer() {
-         mHandler.removeCallbacks(dismissTopBottomRunnable);
+        mHandler.removeCallbacks(dismissTopBottomRunnable);
     }
 
     @Override
     public void onClick(View v) {
-        if(v == mCenterStart){
+        if (v == mCenterStart) {
 
             mControll.release();
             mControll.start();
 
-        }else if(v == mPasue){
-            if(mControll.isPlaying()){
+        } else if (v == mPasue) {
+            if (mControll.isPlaying()) {
                 mControll.pause();
-            }else{
+            } else {
                 mControll.restart();
             }
-        }else if(mBack == v){
+        } else if (mBack == v) {
             mControll.finish();
-        }else if(v == this){
+        } else if (v == this) {
             setTopBottomVisible(!mTopBottomVisible);
         }
     }
@@ -257,8 +271,8 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         //滑动结束
-        if(mControll.isPause()){
-             mControll.restart();
+        if (mControll.isPause() || mControll.isBuffPause()) {
+            mControll.restart();
         }
 
         int pos = (int) (mControll.getDuration() * seekBar.getProgress() / 100f); //
@@ -267,19 +281,30 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     }
 
 
-    public interface WxMediaControll{
-        void    release();
-        void    start();
-        void    restart();
-        void    pause();
-        int     getDuration();
-        int     getCurrentPosition();
-        void    seekTo(int pos);
+    public interface WxMediaControll {
+        void release();
+
+        void start();
+
+        void restart();
+
+        void pause();
+
+        int getDuration();
+
+        int getCurrentPosition();
+
+        void seekTo(int pos);
+
         boolean isPlaying();
+
         boolean isIDLE();
+
         boolean isPause();
+
         boolean isBuffPause();
-        int     getBufferPercentage();
+
+        int getBufferPercentage();
 
         void finish();
 
