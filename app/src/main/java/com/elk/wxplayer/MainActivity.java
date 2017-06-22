@@ -8,6 +8,7 @@ import android.view.View;
 import com.elk.wxplayer.play.PlayerActivity;
 import com.elk.wxplayer.record.Camera2Activity;
 import com.elk.wxplayer.record.RecordSoundActivity;
+import com.elk.wxplayer.record.RecordVideoActivity;
 import com.elk.wxplayer.record.TakePicActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,6 +44,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this,RecordSoundActivity.class));
+            }
+        });
+        findViewById(R.id.btn5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,RecordVideoActivity.class));
             }
         });
      }

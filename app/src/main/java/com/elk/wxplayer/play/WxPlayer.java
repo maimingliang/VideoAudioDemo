@@ -391,7 +391,13 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
 
             // the size is fixed
            int width = getDeviceWidth(); // 对视频缩放
-            int height = width * mVideoHeight / mVideoWidth;
+            int height = 0;
+
+            if(mVideoWidth == 0 || mVideoHeight == 0){
+                height = getDeviceHeight();
+            }else{
+                height = width * mVideoHeight / mVideoWidth;
+            }
 
             // for compatibility, we adjust size based on aspect ratio
 //            if ( mVideoWidth * height  < width * mVideoHeight ) {

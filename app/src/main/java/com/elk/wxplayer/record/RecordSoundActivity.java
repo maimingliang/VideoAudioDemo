@@ -4,6 +4,7 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -58,6 +59,17 @@ public class RecordSoundActivity extends AppCompatActivity {
 
     private void stop() {
         if(mSoundFile != null && mSoundFile.exists()){
+
+            Log.e("stop", "   path  =   " + mSoundFile.getAbsolutePath());
+            release();
+        }
+    }
+
+
+    private void release(){
+
+        Log.e("release", "---- release");
+        if(mMediaRecorder != null){
             mMediaRecorder.stop();
             mMediaRecorder.release();
             mMediaRecorder = null;
@@ -81,17 +93,28 @@ public class RecordSoundActivity extends AppCompatActivity {
 
             mMediaRecorder = new MediaRecorder();
 
-            //set sound
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_NB);
-            mMediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+            // 设置录音的声音来源
+            mMediaRecorder.setAudioSource(MediaRecorder
+                    .AudioSource.MIC);
+            // 设置录制的声音的输出格式（必须在设置声音编码格式之前设置）
+            mMediaRecorder.setOutputFormat(MediaRecorder
+                    .OutputFormat.AMR_NB);
+            // 设置声音编码的格式
+            mMediaRecorder.setAudioEncoder(MediaRecorder
+                    .AudioEncoder.AMR_NB);
             mMediaRecorder.setOutputFile(mSoundFile.getAbsolutePath());
-
             mMediaRecorder.prepare();
-            mMediaRecorder.start();
+            // 开始录音
+            mMediaRecorder.start();  //①
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        release();
     }
 }
