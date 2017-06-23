@@ -38,6 +38,8 @@
         </activity>
         <activity android:name=".record.RecordVideoActivity">
         </activity>
+        <activity android:name=".record.NewRecordVideoActivity">
+        </activity>
     </application>
 
 </manifest>
