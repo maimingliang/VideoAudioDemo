@@ -121,14 +121,14 @@ public class NewRecordVideoActivity extends AppCompatActivity implements View.On
                 List<String> focusModes = parameters.getSupportedFocusModes();
                 if (focusModes != null) {
                     for (String mode : focusModes) {
-                        mode.contains("continuous-video");
-                        parameters.setFocusMode("continuous-video");
+                        if(mode.contains("continuous-video")){
+                            parameters.setFocusMode("continuous-video");
+                        }
                     }
                 }
 
                 mCamera.setParameters(parameters);
                 mCamera.startPreview();
-
 
             } catch (IOException e) {
                 e.printStackTrace();

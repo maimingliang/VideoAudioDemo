@@ -12,6 +12,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.elk.wxplayer.CameraHelper;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -19,13 +21,6 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 类       名:
- * 说       明:
- * 修 改 记 录:
- * 版 权 所 有:   Copyright © 2017
- * 公       司:   深圳市旅联网络科技有限公司
- * version   0.1
- * date   2017/6/22
  * author   maimingliang
  */
 
@@ -150,67 +145,17 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         Camera.Parameters parameters = mCamera.getParameters();
 
         List<Camera.Size> supportedPictureSizes = parameters.getSupportedPictureSizes();
-
-        Camera.Size closelyPreSize = getCloselyPreSize(width, height, supportedPictureSizes);
-        //        parameters.setPreviewFpsRange(4,10); //fps
-        //        parameters.setJpegQuality(100);
-
-
+        List<Camera.Size> videoSizes = parameters.getSupportedVideoSizes();
+        Camera.Size optimalVideoSize = CameraHelper.getOptimalVideoSize(videoSizes, supportedPictureSizes, width, height);
+//
+//        parameters.setPreviewFpsRange(4,10); //fps
+//        parameters.setJpegQuality(100);
         parameters.setPictureFormat(ImageFormat.JPEG);
-//        parameters.setPreviewSize(closelyPreSize.width, closelyPreSize.height);
-        parameters.setPreviewSize(height, width);
+         parameters.setPreviewSize(optimalVideoSize.width, optimalVideoSize.height);
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
         mCamera.setParameters(parameters);
     }
-    /**
-     * 通过对比得到与宽高比最接近的尺寸（如果有相同尺寸，优先选择）
-     *
-     * @param surfaceWidth
-     *            需要被进行对比的原宽
-     * @param surfaceHeight
-     *            需要被进行对比的原高
-     * @param preSizeList
-     *            需要对比的预览尺寸列表
-     * @return 得到与原宽高比例最接近的尺寸
-     */
-    protected Camera.Size getCloselyPreSize(int surfaceWidth, int surfaceHeight,
-                                            List<Camera.Size> preSizeList) {
 
-        int ReqTmpWidth;
-        int ReqTmpHeight;
-        // 当屏幕为垂直的时候需要把宽高值进行调换，保证宽大于高
-        if (mIsPortrait) {
-            ReqTmpWidth = surfaceHeight;
-            ReqTmpHeight = surfaceWidth;
-        } else {
-            ReqTmpWidth = surfaceWidth;
-            ReqTmpHeight = surfaceHeight;
-        }
-
-        Log.e("getCloselyPreSize", " ReqTmpWidth = " + ReqTmpWidth + " ReqTmpHeight = " + ReqTmpHeight);
-        //先查找preview中是否存在与surfaceview相同宽高的尺寸
-        for(Camera.Size size : preSizeList){
-            if((size.width == ReqTmpWidth) && (size.height == ReqTmpHeight)){
-                return size;
-            }
-        }
-
-        // 得到与传入的宽高比最接近的size
-        float reqRatio = ((float) ReqTmpWidth) / ReqTmpHeight;
-        float curRatio, deltaRatio;
-        float deltaRatioMin = Float.MAX_VALUE;
-        Camera.Size retSize = null;
-        for (Camera.Size size : preSizeList) {
-            curRatio = ((float) size.width) / size.height;
-            deltaRatio = Math.abs(reqRatio - curRatio);
-            if (deltaRatio < deltaRatioMin) {
-                deltaRatioMin = deltaRatio;
-                retSize = size;
-            }
-        }
-
-        return retSize;
-    }
     private Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {

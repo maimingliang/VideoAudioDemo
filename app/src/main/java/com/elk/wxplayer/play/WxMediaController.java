@@ -17,13 +17,6 @@ import com.elk.wxplayer.NiceUtil;
 import com.elk.wxplayer.R;
 
 /**
- * 类       名:
- * 说       明:
- * 修 改 记 录:
- * 版 权 所 有:   Copyright © 2017
- * 公       司:   深圳市旅联网络科技有限公司
- * version   0.1
- * date   2017/6/19
  * author   maimingliang
  */
 
@@ -177,6 +170,7 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
     }
 
 
+
     private Runnable progressRunnable = new Runnable() {
         @Override
         public void run() {
@@ -192,6 +186,9 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
         }
     };
 
+    /**
+     * 更新进度条
+     */
     private void updateProgress() {
 
         int position = mControll.getCurrentPosition();
@@ -210,6 +207,9 @@ public class WxMediaController extends FrameLayout implements View.OnClickListen
         mDuration.setText(NiceUtil.formatTime(duration));
     }
 
+    /**
+     * 发送更新进条postDelayed
+     */
     public void startUpdateProgress() {
         mHandler.postDelayed(progressRunnable, 500);
     }

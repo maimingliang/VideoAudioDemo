@@ -20,13 +20,6 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * 类       名:
- * 说       明:
- * 修 改 记 录:
- * 版 权 所 有:   Copyright © 2017
- * 公       司:   深圳市旅联网络科技有限公司
- * version   0.1
- * date   2017/6/19
  * author   maimingliang
  */
 
@@ -85,22 +78,29 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
     public WxPlayer(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
-        init();
+        initContainer();
 
     }
 
-
-    private void init() {
+    /**
+     * 创建FrameLayout容器
+     */
+    private void initContainer() {
 
         mContainer = new FrameLayout(mContext);
         mContainer.setBackgroundColor(Color.BLACK);
         LayoutParams params =
                 new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
-        this.addView(mContainer,params);
+        mContainer.setLayoutParams(params);
+        this.addView(mContainer);
 
     }
 
+    /**
+     * 设置UI 控制器
+     * @param controller
+     */
     public void setMediaController(WxMediaController controller){
 
         Log.e("tag", " setMediaController ");
@@ -167,6 +167,9 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
     }
 
 
+    /**
+     * 添加TextureView
+     */
     private void addTextureView() {
         Log.e("tag", " addTextureView ");
         mContainer.removeView(mRlTextueView);
@@ -182,8 +185,6 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
             mTextureView = new TextureView(mContext);
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
-
-
 
         if(mRlTextueView == null){
             mRlTextueView = new RelativeLayout(mContext);
@@ -370,36 +371,35 @@ public class WxPlayer extends FrameLayout implements WxMediaController.WxMediaCo
             mVideoWidth = mp.getVideoWidth();
             mVideoHeight = mp.getVideoHeight();
 
-//            if(mVideoWidth > getDeviceWidth() || mVideoHeight > getDeviceHeight()) {
-//                //如果video的宽或者高超出了当前屏幕的大小，则要进行缩放
-//                float wRatio = (float) mVideoWidth / (float) getDeviceWidth();
-//                float hRatio = (float) mVideoHeight / (float) getDeviceHeight();
-//
-//                //选择大的一个进行缩放
-//                float ratio = Math.max(wRatio, hRatio);
-//
-//                mVideoWidth = (int) Math.ceil((float) mVideoWidth / ratio);
-//                mVideoHeight = (int) Math.ceil((float) mVideoHeight / ratio);
-//
-//                //设置surfaceView的布局参数
-//                mTextureView.setLayoutParams(new LinearLayout.LayoutParams(mVideoWidth, mVideoHeight));
-//
-//                //然后开始播放视频
-//            }
-
+            //            if(mVideoWidth > getDeviceWidth() || mVideoHeight > getDeviceHeight()) {
+            //                //如果video的宽或者高超出了当前屏幕的大小，则要进行缩放
+            //                float wRatio = (float) mVideoWidth / (float) getDeviceWidth();
+            //                float hRatio = (float) mVideoHeight / (float) getDeviceHeight();
+            //
+            //                //选择大的一个进行缩放
+            //                float ratio = Math.max(wRatio, hRatio);
+            //
+            //                mVideoWidth = (int) Math.ceil((float) mVideoWidth / ratio);
+            //                mVideoHeight = (int) Math.ceil((float) mVideoHeight / ratio);
+            //
+            //                //设置surfaceView的布局参数
+            //                mTextureView.setLayoutParams(new LinearLayout.LayoutParams(mVideoWidth, mVideoHeight));
+            //
+            //                //然后开始播放视频
+            //            }
 
 
             // the size is fixed
-           int width = getDeviceWidth(); // 对视频缩放
+            int width = getDeviceWidth(); // 对视频缩放
             int height = 0;
 
-            if(mVideoWidth == 0 || mVideoHeight == 0){
+            if (mVideoWidth == 0 || mVideoHeight == 0) {
                 height = getDeviceHeight();
-            }else{
+            } else {
                 height = width * mVideoHeight / mVideoWidth;
             }
 
-            // for compatibility, we adjust size based on aspect ratio
+//            // for compatibility, we adjust size based on aspect ratio
 //            if ( mVideoWidth * height  < width * mVideoHeight ) {
 //                width = height * mVideoWidth / mVideoHeight;
 //            } else if ( mVideoWidth * height  > width * mVideoHeight ) {
